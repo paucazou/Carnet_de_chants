@@ -27,7 +27,7 @@ new_song () {
     if [[ `__check_name_entered $1` == 1 ]]; then
         if [[ `__check_file_does_not_exist $1.ly` == 0]]; then
     name=$1
-    touch $songs/$name # lyrics
+    touch $songs/$name.txt # lyrics
     print '\
 \\version "2.22.0"
 \\language "français"
@@ -53,7 +53,17 @@ compile_ly () {
 
 compile_and_pdf () {
     compile_ly $1
-    xdg-open $1.pdf
+    xdg-open ${1%.ly}.pdf
+}
+
+finish () {
+    if [[ `__check_file_does_not_exist $1` == 1 ]]; then
+        filename=${1:r}
+        ext=${1:e}
+        mv $1 ${filename}.f.${ext}
+    else
+        print No file.
+    fi
 }
 
 
