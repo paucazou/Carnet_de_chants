@@ -25,7 +25,7 @@ __check_file_does_not_exist () {
 
 new_song () {
     if [[ `__check_name_entered $1` == 1 ]]; then
-        if [[ `__check_file_does_not_exist $1.ly` == 0]]; then
+        if [[ `__check_file_does_not_exist $1.ly` == 0 ]]; then
     name=$1
     touch $songs/$name.txt # lyrics
     print '\
@@ -34,8 +34,12 @@ new_song () {
 \relative {
 }' >> $songs/$name.ly
     print $1 created
+    git add $songs/$name.txt
+    git add $songs/$name.ly
+    git commit $songs/$name.txt $songs/$name.ly -m "Added $name"
 else
     print $1 already exists
+        fi
     else
         print No name entered
     fi
