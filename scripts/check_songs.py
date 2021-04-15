@@ -18,15 +18,19 @@ directory = "./songs/"
 
 class Song:
     suffixes =  "f.txt txt pdf f.ly ly".split()
-    def __init__(self, basename):
-        self.basename = basename
+    def __init__(self, basepath):
+        self.basename = basepath.name
+        self.basepath = basepath
         for suffix in self.suffixes:
-            setattr(self, suffix.replace('.','_'), os.path.exists(basename.with_suffix(f'.{suffix}')))
+            setattr(self, suffix.replace('.','_'), os.path.exists(basepath.with_suffix(f'.{suffix}')))
         self._modified = None
+
+    def __repr__(self):
+        return self.basename.__str__()
 
     def __last_modif(self):
         """Return the epoch value for the last file modified"""
-        return __time(os.path.getmtime,
+        return self.__time(os.path.getmtime,
                 lambda x, y : x > y,
                 '_modified')
 
@@ -73,10 +77,10 @@ class Song:
             return getattr(self, name)
 
         self._modified = 0
-        for suffix, file_exists in self.__dict__.items():
-            if file_exists:
-                val = func_time(basename.with_suffix(f".{suffix.replace('_','.')}"))
-                if func_compare(val, getattr(self,name):
+        for suffix in self.suffixes:
+            if getattr(self,suffix.replace('.','_')):
+                val = func_time(self.basepath.with_suffix(f".{suffix.replace('_','.')}"))
+                if func_compare(val, getattr(self,name)):
                     setattr(self, name,val)
         return self._modified
 
@@ -84,14 +88,14 @@ class Song:
         """True if song is finished"""
         return self.statusof('txt') == self.statusof('pdf') == self.statusof('ly') == 1
 
-    modification_time = property(self.__last_modif)
-    is_finished = property(self._is_finished)
+    modification_time = property(__last_modif)
+    is_finished = property(_is_finished)
 
 
 def analyse_content():
     """Analyse the content of the directory"""
     files = os.listdir(directory)
-    basic_names = set([pathlib.Path(name).with_suffix('') for name in files ])
+    basic_names = set([pathlib.Path(directory + name).with_suffix('') for name in files ])
     return [Song(basename) for basename in basic_names]
 
 def update_index(data):
@@ -113,12 +117,12 @@ def update_index(data):
 
     # alphabetical order
     alphabetical_order = ""
-    for song, str_val in sorted(str_data.items(),key=lambda k,v:k.basename):
+    for song, str_val in sorted(str_data.items(),key=lambda x:x[0].basename):
         alphabetical_order += str_val + '\n'
 
     # finished order
     finish_order = ""
-    for song, str_val in sorted(str_data.items(),key=lambda k,v: k.modification_time):
+    for song, str_val in sorted(str_data.items(),key=lambda x: x[0].modification_time):
         if song.is_finished is False:
             continue
         finish_order += str_val + '\n'
@@ -129,7 +133,7 @@ TXT | LY | PDF
 --- | -- | ---
 """
 
-    str_value = """
+    str_value = f"""
 # Liste alphabétique des chants
 {headers}
 {alphabetical_order}
@@ -139,6 +143,11 @@ TXT | LY | PDF
 """
     with open(index,'w') as f:
         f.write(str_value)
+
+if __name__ == "__main__":
+    data = analyse_content()
+    update_index(data)
+
         
     
 
