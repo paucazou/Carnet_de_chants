@@ -63,7 +63,7 @@ class Song:
             elif self.statusof(name) == 0:
                 return self.basename + f".{name}"
         if self.statusof('pdf') == 1:
-            return self.basename.with_suffix('pdf')
+            return self.basepath.with_suffix('.pdf')
         return ''
 
 
@@ -128,19 +128,16 @@ def update_index(data):
         finish_order += str_val + '\n'
 
     # headers
-    headers = """
-TXT | LY | PDF
---- | -- | ---
-"""
+    headers = """Nom | TXT | LY | PDF
+--- | --- | -- | ---"""
 
     str_value = f"""
 # Liste alphabétique des chants
 {headers}
-{alphabetical_order}
-#Listes des chants finis par ordre d'achèvement
+{alphabetical_order}# Liste des chants finis par ordre d'achèvement
 {headers}
-{finish_order}
-"""
+{finish_order}"""
+
     with open(index,'w') as f:
         f.write(str_value)
 

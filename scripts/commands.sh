@@ -54,7 +54,7 @@ update () {
 }
 
 compile_ly () {
-    lilypond $1
+    lilypond  --output=$songs $1
     update
 }
 
