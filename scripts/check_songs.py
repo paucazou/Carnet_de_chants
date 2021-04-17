@@ -14,15 +14,19 @@ import os
 import pathlib
 
 index = "index.md"
+finish = "finished"
 directory = "./songs/"
+with open("finished") as f:
+    finish_content = f.read().split('\n')
+    finish_content = [pathlib.Path(elt) for elt in finish_content]
 
 class Song:
-    suffixes =  "f.txt txt pdf f.ly ly".split()
+    suffixes =  "txt pdf ly".split()
     def __init__(self, basepath):
         self.basename = basepath.name
         self.basepath = basepath
         for suffix in self.suffixes:
-            setattr(self, suffix.replace('.','_'), os.path.exists(basepath.with_suffix(f'.{suffix}')))
+            setattr(self, suffix, os.path.exists(basepath.with_suffix(f'.{suffix}')))
         self._modified = None
 
     def __repr__(self):
@@ -40,32 +44,15 @@ class Song:
             -1 (not found)
             0 unfinished
             1 finished"""
-        if name == "txt":
-            if self.f_txt:
-                return 1
-            if self.txt:
-                return 0
-        elif name == "ly":
-            if self.f_ly:
-                return 1
-            if self.ly:
-                return 0
-        elif name == "pdf":
-            if self.pdf:
-                return 1
-        return -1
+        if not getattr(self,name):
+            return -1
+        if not (name == "pdf") and self.basepath.with_suffix('.'+name) not in finish_content:
+            return 0
+        return 1
     
     def link_of(self, name):
         """Return a link to the file matching with name"""
-        if name in ("txt","ly"):
-            if self.statusof(name) == 1:
-                return self.basename + f"f.{name}"
-            elif self.statusof(name) == 0:
-                return self.basename + f".{name}"
-        if self.statusof('pdf') == 1:
-            return self.basepath.with_suffix('.pdf')
-        return ''
-
+        return self.basename + "." + name
 
     def __created(self):
         """Return the epoch value for the first file created"""
@@ -79,7 +66,7 @@ class Song:
         self._modified = 0
         for suffix in self.suffixes:
             if getattr(self,suffix.replace('.','_')):
-                val = func_time(self.basepath.with_suffix(f".{suffix.replace('_','.')}"))
+                val = func_time(self.basepath.with_suffix(f".{suffix}"))
                 if func_compare(val, getattr(self,name)):
                     setattr(self, name,val)
         return self._modified
@@ -143,6 +130,7 @@ def update_index(data):
 
 if __name__ == "__main__":
     data = analyse_content()
+    #from IPython import embed; embed()
     update_index(data)
 
         

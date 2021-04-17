@@ -66,14 +66,22 @@ compile_and_pdf () {
 
 finish () {
     if [[ `__check_file_does_not_exist $1` == 1 ]]; then
-        filename=${1:r}
-        ext=${1:e}
-        mv $1 ${filename}.f.${ext}
+        code_line="import scripts.update_status as sus; sus.update_status(\"$1\",1)"
+        python -c $code_line
         update
     else
         print No file.
     fi
 }
+unfinish () {
+    if [[ `__check_file_does_not_exist $1` == 1 ]]; then
+        python -m "import scripts.update_status as sus; sus.update_status($1,0)"
+        update
+    else
+        print No file.
+    fi
+}
+
 
 
 
