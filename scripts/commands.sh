@@ -32,7 +32,12 @@ new_song () {
 \\version "2.22.0"
 \\language "français"
 \\relative {
-}' >> $songs/$name.ly
+\key 
+\time 
+}
+\\addlyrics {
+}
+' >> $songs/$name.ly
     print $1 created
     git add $songs/$name.txt
     git add $songs/$name.ly
