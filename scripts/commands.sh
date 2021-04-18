@@ -27,21 +27,12 @@ new_song () {
     if [[ `__check_name_entered $1` == 1 ]]; then
         if [[ `__check_file_does_not_exist $1.ly` == 0 ]]; then
     name=$1
-    touch $songs/$name.txt # lyrics
-    print '\
-\\version "2.22.0"
-\\language "français"
-\\relative {
-\key 
-\time 
-}
-\\addlyrics {
-}
-' >> $songs/$name.ly
+    touch $songs/$name.doc # lyrics
+    cat scripts/template.ly >> $songs/$name.ly
     print $1 created
-    git add $songs/$name.txt
+    git add $songs/$name.doc
     git add $songs/$name.ly
-    git commit $songs/$name.txt $songs/$name.ly -m "Added $name"
+    git commit $songs/$name.doc $songs/$name.ly -m "Added $name"
     update
 else
     print $1 already exists

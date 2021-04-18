@@ -5,7 +5,7 @@
 which songs are considered finished,
 i.e. which song has three files with the same
 name with 3 extensions:
-    - .txt (lyrics)
+    - .doc (lyrics)
     - .ly
     - .pdf (score)
 It updates a index: index.md
@@ -21,7 +21,7 @@ with open("finished") as f:
     finish_content = [pathlib.Path(elt) for elt in finish_content]
 
 class Song:
-    suffixes =  "txt pdf ly".split()
+    suffixes =  "doc pdf ly".split()
     def __init__(self, basepath):
         self.basename = basepath.name
         self.basepath = basepath
@@ -39,7 +39,7 @@ class Song:
                 '_modified')
 
     def statusof(self, name):
-        """Status of txt, pdf, ly.
+        """Status of doc, pdf, ly.
         Possible values:
             -1 (not found)
             0 unfinished
@@ -73,7 +73,7 @@ class Song:
 
     def _is_finished(self):
         """True if song is finished"""
-        return self.statusof('txt') == self.statusof('pdf') == self.statusof('ly') == 1
+        return self.statusof('doc') == self.statusof('pdf') == self.statusof('ly') == 1
 
     modification_time = property(__last_modif)
     is_finished = property(_is_finished)
@@ -82,7 +82,7 @@ class Song:
 def analyse_content():
     """Analyse the content of the directory"""
     files = os.listdir(directory)
-    basic_names = set([pathlib.Path(directory + name).with_suffix('') for name in files ])
+    basic_names = set([pathlib.Path(directory + name).with_suffix('') for name in files  if name[0] != '.'])
     return [Song(basename) for basename in basic_names]
 
 def update_index(data):
@@ -93,14 +93,14 @@ def update_index(data):
     status = ":white_check_mark: :heavy_check_mark: :x:".split()
 
     for song in data:
-        txt_status = status[song.statusof('txt')]
-        txt_link = song.link_of('txt')
+        doc_status = status[song.statusof('doc')]
+        doc_link = song.link_of('doc')
         ly_status = status[song.statusof('ly')]
         ly_link = song.link_of('ly')
         pdf_status = status[song.statusof('pdf')]
         pdf_link = song.link_of('pdf')
 
-        str_data[song] = f"{song.basename} | [{txt_status}](songs/{txt_link}) | [{ly_status}](songs/{ly_link}) | [{pdf_status}](songs/{pdf_link})"
+        str_data[song] = f"{song.basename} | [{doc_status}](songs/{doc_link}) | [{ly_status}](songs/{ly_link}) | [{pdf_status}](songs/{pdf_link})"
 
     # alphabetical order
     alphabetical_order = ""
@@ -115,7 +115,7 @@ def update_index(data):
         finish_order += str_val + '\n'
 
     # headers
-    headers = """Nom | TXT | LY | PDF
+    headers = """Nom | DOC | LY | PDF
 --- | --- | -- | ---"""
 
     str_value = f"""
