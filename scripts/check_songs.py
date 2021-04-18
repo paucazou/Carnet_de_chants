@@ -52,7 +52,7 @@ class Song:
     
     def link_of(self, name):
         """Return a link to the file matching with name"""
-        return self.basename + "." + name
+        return self.basename + "." + name if os.path.exists(self.basepath.with_suffix('.' + name)) else ''
 
     def __created(self):
         """Return the epoch value for the first file created"""
