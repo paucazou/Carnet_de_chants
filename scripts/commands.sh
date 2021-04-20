@@ -69,6 +69,13 @@ finish () {
         print No file.
     fi
 }
+
+finish_insecable () {
+        insecable="import scripts.insecable as si; si.add_non_breaking_space_for(\"$1\")"
+        python -c $insecable
+        finish
+    }
+
 unfinish () {
     if [[ `__check_file_does_not_exist $1` == 1 ]]; then
         python -m "import scripts.update_status as sus; sus.update_status($1,0)"
